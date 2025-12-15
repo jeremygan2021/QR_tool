@@ -10,12 +10,13 @@
             --secondary-bg: #302b63;
             --tertiary-bg: #24243e;
             --accent-color: #00f2fe;
-            --accent-gradient: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-color: #ffffff;
             --text-muted: #a0a0a0;
             --danger-color: #ff4b4b;
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
 
         body {
@@ -29,6 +30,7 @@
             align-items: center;
             padding: 2rem;
             box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .main-container {
@@ -43,71 +45,87 @@
             border: 1px solid var(--glass-border);
             border-radius: 24px;
             padding: 2.5rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
         }
 
         @media (max-width: 900px) {
             body {
                 padding: 1rem;
+                align-items: flex-start;
             }
             .main-container {
                 grid-template-columns: 1fr;
                 padding: 1.5rem;
-                gap: 1.5rem;
+                gap: 2rem;
+                margin-top: 1rem;
             }
             .section-title {
-                font-size: 1.3rem;
+                font-size: 1.4rem;
+                text-align: center;
             }
-            .action-btn {
-                padding: 14px 24px;
-                font-size: 1rem;
+            .config-panel {
+                padding-right: 0 !important;
             }
         }
 
         /* Section Styling */
         .section-title {
             color: var(--accent-color);
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             margin-bottom: 1.5rem;
             font-weight: 700;
-            text-transform: uppercase;
             letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
         }
 
         .config-panel {
-            padding-right: 1rem;
+            padding-right: 2rem;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
 
         @media (max-width: 900px) {
             .config-panel {
-                padding-right: 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                padding-bottom: 2rem;
             }
         }
 
         /* Tabs */
         .tabs {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.8rem;
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
         }
 
         .tab-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
             color: var(--text-muted);
-            padding: 10px 20px;
-            border-radius: 12px;
+            padding: 10px 24px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateY(-2px);
         }
 
         .tab-btn.active {
             background: var(--accent-gradient);
             color: white;
             font-weight: 600;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
         }
         
         /* More Tools Dropdown Area */
@@ -116,20 +134,21 @@
             margin-bottom: 1.5rem;
             display: none;
             background: rgba(0,0,0,0.2);
-            padding: 1rem;
-            border-radius: 12px;
+            padding: 1.2rem;
+            border-radius: 16px;
             animation: fadeIn 0.3s ease;
+            border: 1px solid var(--glass-border);
         }
         
         .more-tools-container.active {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.8rem;
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab-content.active {
@@ -138,22 +157,24 @@
 
         /* Form Elements */
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         input[type="text"], input[type="email"], input[type="password"], select, textarea {
             width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--glass-border);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
             font-size: 1rem;
             box-sizing: border-box;
@@ -163,19 +184,61 @@
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
+            line-height: 1.5;
         }
 
         input:focus, select:focus, textarea:focus {
             border-color: var(--accent-color);
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.1);
+        }
+
+        /* Custom File Upload */
+        .file-upload-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .file-upload-label:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .file-name {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
         }
 
         /* Color Pickers */
         .color-row {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
         
         .color-group {
@@ -186,10 +249,15 @@
             -webkit-appearance: none;
             border: none;
             width: 100%;
-            height: 40px;
-            border-radius: 8px;
+            height: 44px;
+            border-radius: 10px;
             background: none;
             cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        input[type="color"]:hover {
+            transform: scale(1.02);
         }
         
         input[type="color"]::-webkit-color-swatch-wrapper {
@@ -198,22 +266,63 @@
         
         input[type="color"]::-webkit-color-swatch {
             border: 1px solid var(--glass-border);
-            border-radius: 8px;
+            border-radius: 10px;
         }
 
         /* Checkbox */
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 1rem;
+            gap: 12px;
+            margin-bottom: 1.5rem;
             cursor: pointer;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .checkbox-group:hover {
+            background: rgba(255,255,255,0.06);
         }
 
         .checkbox-group input {
             width: 20px;
             height: 20px;
             cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        /* Range Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin: 10px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
         }
 
         /* Preview Panel */
@@ -221,19 +330,28 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             background: rgba(0,0,0,0.2);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 2.5rem;
             position: relative;
+            min-height: 500px;
         }
 
         #qr-image {
             max-width: 100%;
             max-height: 400px;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 2rem;
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+
+        #qr-image:hover {
+            transform: scale(1.02) translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 242, 254, 0.2);
+            border-color: var(--accent-color);
         }
 
         .checkerboard {
@@ -252,35 +370,57 @@
             background: var(--accent-gradient);
             color: white;
             border: none;
-            padding: 16px 32px;
+            padding: 18px 36px;
             border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
             cursor: pointer;
             width: 100%;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.2s;
+            letter-spacing: 1.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
         }
 
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.6);
+        }
+
+        .action-btn:hover::after {
+            left: 100%;
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
         }
 
         .download-group {
             display: flex;
             gap: 1rem;
             width: 100%;
-            margin-top: 1rem;
+            margin-top: auto;
         }
 
         .secondary-btn {
-            background: transparent;
+            background: rgba(255,255,255,0.05);
             border: 2px solid var(--accent-color);
             color: var(--accent-color);
-            padding: 12px;
+            padding: 14px;
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
@@ -288,15 +428,18 @@
             text-align: center;
             text-decoration: none;
             transition: all 0.3s ease;
+            font-size: 1rem;
         }
 
         .secondary-btn:hover {
             background: var(--accent-color);
             color: var(--primary-bg);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            transform: translateY(-2px);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -437,13 +580,19 @@
 
                 <div class="form-group">
                     <label>上传 Logo (可选)</label>
-                    <input type="file" name="logo" accept="image/*">
+                    <div class="file-upload-wrapper">
+                        <label for="logo-upload" class="file-upload-label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            选择图片
+                        </label>
+                        <input type="file" id="logo-upload" name="logo" accept="image/*" onchange="updateFileName(this)">
+                        <span id="file-name" class="file-name">未选择文件</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>尺寸 (px)</label>
+                    <label>尺寸 (px): <span id="size-val" style="color:var(--accent-color); font-weight:bold;">350</span></label>
                     <input type="range" name="size" min="200" max="1000" value="350" oninput="document.getElementById('size-val').innerText = this.value">
-                    <span id="size-val" style="color:var(--text-muted); font-size: 0.9rem">350</span>
                 </div>
 
                 <button type="submit" class="action-btn" id="generate-btn">生成二维码</button>
@@ -453,9 +602,11 @@
         <!-- Right Panel: Preview -->
         <div class="preview-panel">
             <h2 class="section-title">效果预览</h2>
-            <div id="preview-container">
+            <div id="preview-container" style="width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center;">
                 <img id="qr-image" src="" alt="QR Preview" style="display:none">
-                <div id="placeholder" style="color: var(--text-muted); text-align: center; padding: 2rem; border: 2px dashed var(--glass-border); border-radius: 12px;">
+                <div id="placeholder" style="color: var(--text-muted); text-align: center; padding: 3rem; border: 2px dashed var(--glass-border); border-radius: 16px; width: 80%;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <br>
                     输入内容并点击生成查看预览
                 </div>
             </div>
@@ -468,6 +619,17 @@
     </div>
 
     <script>
+        function updateFileName(input) {
+            const fileNameSpan = document.getElementById('file-name');
+            if (input.files && input.files.length > 0) {
+                fileNameSpan.textContent = input.files[0].name;
+                fileNameSpan.style.color = 'var(--text-color)';
+            } else {
+                fileNameSpan.textContent = '未选择文件';
+                fileNameSpan.style.color = 'var(--text-muted)';
+            }
+        }
+
         function switchTab(tabId) {
             // Update buttons
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -524,6 +686,8 @@
             
             btn.innerText = '生成中...';
             btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.style.cursor = 'wait';
 
             try {
                 // Request PNG for preview
@@ -562,6 +726,8 @@
             } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
             }
         });
 
