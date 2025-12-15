@@ -239,7 +239,10 @@ def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=Non
             print(f"添加Logo时出错: {e}")
     
     # 保存图像
-    qr_img.save(output_file)
+    if isinstance(output_file, str):
+        qr_img.save(output_file)
+    else:
+        qr_img.save(output_file, format='PNG')
     return output_file
 
 def generate_gradient_qr(data, output_file="gradient_qrcode.png", start_color="#1E88E5", 
@@ -357,7 +360,10 @@ def generate_gradient_qr(data, output_file="gradient_qrcode.png", start_color="#
                 )
     
     # 保存图像
-    gradient_img.save(output_file)
+    if isinstance(output_file, str):
+        gradient_img.save(output_file)
+    else:
+        gradient_img.save(output_file, format='PNG')
     return output_file
 
 # 使用示例

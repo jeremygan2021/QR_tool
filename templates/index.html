@@ -1,126 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
+    <title>叠加态QRcode小工具</title>
     <style>
+        :root {
+            --primary-bg: #0f0c29;
+            --secondary-bg: #302b63;
+            --tertiary-bg: #24243e;
+            --accent-color: #00f2fe;
+            --accent-gradient: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f5f5f7;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg), var(--tertiary-bg));
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            overflow-x: hidden;
         }
+
         .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 254, 0.1);
+            width: 90%;
+            max-width: 480px;
             text-align: center;
+            transition: transform 0.3s ease;
         }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 242, 254, 0.2);
+        }
+
         h1 {
-            margin-bottom: 1.5rem;
-            color: #333;
+            margin-bottom: 2rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+            text-transform: uppercase;
         }
+
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             text-align: left;
+            position: relative;
         }
+
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #666;
-            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
+
         input[type="text"], select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: #fff;
             font-size: 1rem;
-            box-sizing: border-box; 
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            outline: none;
         }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        select option {
+            background-color: var(--tertiary-bg);
+            color: white;
+        }
+
         button {
-            background-color: #007aff;
+            background: var(--accent-gradient);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
         }
+
         button:hover {
-            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+            filter: brightness(1.1);
         }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
         #result {
-            margin-top: 2rem;
+            margin-top: 2.5rem;
             display: none;
+            animation: fadeIn 0.5s ease-out;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         #qr-image {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
         }
+
+        #qr-image:hover {
+            transform: scale(1.02);
+        }
+
         .download-btn {
-            background-color: #34c759;
+            background: transparent;
             display: inline-block;
             text-decoration: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            color: var(--accent-color);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            border: 2px solid var(--accent-color);
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
+
         .download-btn:hover {
-            background-color: #248a3d;
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>QR Code Generator</h1>
+        <h1>叠加态QRcode小工具</h1>
         <form id="qr-form">
             <div class="form-group">
-                <label for="url">URL or Text</label>
-                <input type="text" id="url" name="url" placeholder="https://example.com" required>
+                <label for="url">链接 / 文本内容</label>
+                <input type="text" id="url" name="url" placeholder="在此输入需要转换的内容..." required>
             </div>
             
             <div class="form-group">
-                <label for="size">Size (px)</label>
+                <label for="size">生成尺寸</label>
                 <select id="size" name="size">
-                    <option value="350">Medium (350x350)</option>
-                    <option value="200">Small (200x200)</option>
-                    <option value="500">Large (500x500)</option>
-                    <option value="800">Extra Large (800x800)</option>
+                    <option value="350">标准 (350x350)</option>
+                    <option value="200">小尺寸 (200x200)</option>
+                    <option value="500">大尺寸 (500x500)</option>
+                    <option value="800">超高清 (800x800)</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="style">Style</label>
+                <label for="style">视觉风格</label>
                 <select id="style" name="style">
-                    <option value="rounded">Rounded Black</option>
-                    <option value="circle">Circle Black</option>
-                    <option value="orange_circle">Circle Orange</option>
-                    <option value="gradient">Gradient (Blue-Green)</option>
-                    <option value="classic">Classic Box</option>
+                    <option value="rounded">科技黑圆角</option>
+                    <option value="circle">极简黑圆点</option>
+                    <option value="orange_circle">活力橙圆点</option>
+                    <option value="gradient">赛博渐变色</option>
+                    <option value="classic">经典方块格</option>
                 </select>
             </div>
 
-            <button type="submit">Generate QR Code</button>
+            <button type="submit">立即生成</button>
         </form>
 
         <div id="result">
             <img id="qr-image" src="" alt="QR Code">
             <br>
-            <a id="download-link" href="#" class="download-btn" download="qrcode.png">Download Image</a>
+            <a id="download-link" href="#" class="download-btn" download="qrcode.png">下载图片</a>
         </div>
     </div>
 
@@ -131,7 +221,7 @@
             const formData = new FormData(this);
             const button = this.querySelector('button');
             const originalText = button.innerText;
-            button.innerText = 'Generating...';
+            button.innerText = '生成中...';
             button.disabled = true;
 
             try {
@@ -152,11 +242,11 @@
                     
                     document.getElementById('result').style.display = 'block';
                 } else {
-                    alert('Error generating QR code');
+                    alert('生成失败，请重试');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred');
+                alert('发生错误，请检查网络连接');
             } finally {
                 button.innerText = originalText;
                 button.disabled = false;
