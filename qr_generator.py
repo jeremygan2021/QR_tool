@@ -2,8 +2,99 @@ import qrcode
 from PIL import Image, ImageDraw, ImageFilter
 import numpy as np
 import os
+import io
+import base64
 
-def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=None, 
+def generate_svg_qr_code(data, output_file=None, color="#000000", bg_color="#FFFFFF", 
+                         style="classic", border=4, box_size=12, logo_obj=None, logo_path=None):
+    """
+    Generate SVG QR code with basic styling and logo support
+    """
+    # Create QR matrix
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=box_size,
+        border=border,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+    
+    matrix = qr.get_matrix()
+    matrix_size = len(matrix)
+    
+    # Calculate dimensions
+    module_size = box_size
+    total_size = (matrix_size + 2 * border) * module_size
+    offset = border * module_size
+    
+    # Start SVG
+    svg = [f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{total_size}" height="{total_size}" viewBox="0 0 {total_size} {total_size}">']
+    
+    # Background
+    if bg_color != "transparent":
+        svg.append(f'<rect x="0" y="0" width="{total_size}" height="{total_size}" fill="{bg_color}"/>')
+        
+    # Draw modules
+    for y in range(matrix_size):
+        for x in range(matrix_size):
+            if matrix[y][x]:
+                pos_x = offset + x * module_size
+                pos_y = offset + y * module_size
+                
+                if style == "circle":
+                    # Circle style
+                    cx = pos_x + module_size / 2
+                    cy = pos_y + module_size / 2
+                    r = module_size / 2 * 0.9  # Slight padding
+                    svg.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{color}"/>')
+                elif style == "rounded":
+                    # Rounded rect style
+                    padding = module_size * 0.05
+                    size = module_size * 0.9
+                    rx = size * 0.3
+                    svg.append(f'<rect x="{pos_x + padding}" y="{pos_y + padding}" width="{size}" height="{size}" rx="{rx}" fill="{color}"/>')
+                else:
+                    # Classic square
+                    # Optimize by drawing only if needed? No, just draw all.
+                    # Add small padding to avoid gaps? Or exact.
+                    # Usually exact is better for crispness, but slight overlap helps anti-aliasing.
+                    # Let's do exact.
+                    svg.append(f'<rect x="{pos_x}" y="{pos_y}" width="{module_size}" height="{module_size}" fill="{color}"/>')
+
+    # Add Logo
+    logo = None
+    if logo_obj:
+        logo = logo_obj
+    elif logo_path and os.path.exists(logo_path):
+        logo = Image.open(logo_path)
+        
+    if logo:
+        # Convert logo to base64
+        buffered = io.BytesIO()
+        logo.save(buffered, format="PNG")
+        logo_b64 = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Calculate position and size (20% of QR size)
+        logo_display_size = total_size * 0.2
+        logo_x = (total_size - logo_display_size) / 2
+        logo_y = (total_size - logo_display_size) / 2
+        
+        svg.append(f'<image href="data:image/png;base64,{logo_b64}" x="{logo_x}" y="{logo_y}" width="{logo_display_size}" height="{logo_display_size}" />')
+
+    svg.append('</svg>')
+    svg_content = '\n'.join(svg)
+    
+    if output_file:
+        if hasattr(output_file, 'write'):
+            output_file.write(svg_content.encode('utf-8'))
+        else:
+            with open(output_file, 'w') as f:
+                f.write(svg_content)
+    
+    return svg_content
+
+def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=None, logo_obj=None,
                            color="#000000", bg_color="#FFFFFF", box_size=12, 
                            border=4, style="rounded", img_size=(350, 350), auto_adjust=True):
     """
@@ -166,8 +257,10 @@ def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=Non
                             fill=rgba_color
                         )
         
-        # 创建最终图像
-        if bg_color.upper() == "#FFFFFF":
+            # 创建最终图像
+        if bg_color == "transparent":
+            final_qr = Image.new("RGBA", final_img_size, (0, 0, 0, 0))
+        elif bg_color.upper() == "#FFFFFF":
             final_qr = Image.new("RGBA", final_img_size, (255, 255, 255, 255))
         else:
             bg_rgb = tuple(int(bg_color[i:i+2], 16) for i in (1, 3, 5))
@@ -178,7 +271,12 @@ def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=Non
     else:
         # 经典样式 - 直接使用指定颜色
         final_img_size = img_size
-        classic_img = Image.new("RGBA", final_img_size, bg_color)
+        
+        if bg_color == "transparent":
+            classic_img = Image.new("RGBA", final_img_size, (0, 0, 0, 0))
+        else:
+            classic_img = Image.new("RGBA", final_img_size, bg_color)
+            
         draw = ImageDraw.Draw(classic_img)
         
         # 计算居中位置的起始坐标
@@ -214,10 +312,14 @@ def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=Non
         qr_img = classic_img
     
     # 添加Logo（如果提供）
-    if logo_path and os.path.exists(logo_path):
+    logo = None
+    if logo_obj:
+        logo = logo_obj.convert("RGBA")
+    elif logo_path and os.path.exists(logo_path):
+        logo = Image.open(logo_path).convert("RGBA")
+
+    if logo:
         try:
-            logo = Image.open(logo_path).convert("RGBA")
-            
             # 调整Logo大小，不超过二维码的20%（较大数据时需要更小Logo）
             logo_scale = 5 if data_length < 100 else 6
             logo_max_size = qr_img.size[0] // logo_scale
@@ -238,7 +340,6 @@ def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=Non
         except Exception as e:
             print(f"添加Logo时出错: {e}")
     
-    # 保存图像
     if isinstance(output_file, str):
         qr_img.save(output_file)
     else:
@@ -247,7 +348,7 @@ def generate_styled_qr_code(data, output_file="styled_qrcode.png", logo_path=Non
 
 def generate_gradient_qr(data, output_file="gradient_qrcode.png", start_color="#1E88E5", 
                          end_color="#8BC34A", bg_color="#FFFFFF", box_size=12, 
-                         border=4, img_size=(350, 350), auto_adjust=True):
+                         border=4, img_size=(350, 350), auto_adjust=True, logo_obj=None, logo_path=None):
     """
     生成渐变色二维码
     
@@ -302,7 +403,11 @@ def generate_gradient_qr(data, output_file="gradient_qrcode.png", start_color="#
     
     start_rgb = hex_to_rgb(start_color)
     end_rgb = hex_to_rgb(end_color)
-    bg_rgb = hex_to_rgb(bg_color)
+    
+    if bg_color == "transparent":
+        bg_rgb = (0, 0, 0, 0)
+    else:
+        bg_rgb = hex_to_rgb(bg_color)
     
     # 获取二维码矩阵和大小信息
     qr_matrix = qr.get_matrix()
@@ -322,7 +427,10 @@ def generate_gradient_qr(data, output_file="gradient_qrcode.png", start_color="#
     
     # 创建渐变映射
     final_img_size = img_size
-    gradient_img = Image.new("RGB", final_img_size, bg_rgb)
+    if len(bg_rgb) == 4:
+        gradient_img = Image.new("RGBA", final_img_size, bg_rgb)
+    else:
+        gradient_img = Image.new("RGBA", final_img_size, bg_rgb + (255,))
     
     # 计算居中位置的起始坐标
     start_x = (final_img_size[0] - total_qr_size) // 2 + border_size
@@ -359,6 +467,35 @@ def generate_gradient_qr(data, output_file="gradient_qrcode.png", start_color="#
                     fill=(r, g, b)
                 )
     
+    # 添加Logo（如果提供）
+    logo = None
+    if logo_obj:
+        logo = logo_obj.convert("RGBA")
+    elif logo_path and os.path.exists(logo_path):
+        logo = Image.open(logo_path).convert("RGBA")
+
+    if logo:
+        try:
+            # 调整Logo大小，不超过二维码的20%（较大数据时需要更小Logo）
+            logo_scale = 5 if data_length < 100 else 6
+            logo_max_size = gradient_img.size[0] // logo_scale
+            logo_size = min(logo.size[0], logo.size[1], logo_max_size)
+            logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
+            
+            # 计算位置使Logo居中
+            pos = ((gradient_img.size[0] - logo.size[0]) // 2, (gradient_img.size[1] - logo.size[1]) // 2)
+            
+            # 创建圆形蒙版
+            mask = Image.new("L", logo.size, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0, logo.size[0], logo.size[1]), fill=255)
+            mask = mask.filter(ImageFilter.GaussianBlur(1))
+            
+            # 将Logo粘贴到二维码上
+            gradient_img.paste(logo, pos, mask)
+        except Exception as e:
+            print(f"添加Logo时出错: {e}")
+
     # 保存图像
     if isinstance(output_file, str):
         gradient_img.save(output_file)

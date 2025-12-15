@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>叠加态QRcode小工具</title>
+    <title>叠加态QR-code工具</title>
     <style>
         :root {
             --primary-bg: #0f0c29;
@@ -15,67 +15,142 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-color: #ffffff;
             --text-muted: #a0a0a0;
+            --danger-color: #ff4b4b;
         }
 
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg), var(--tertiary-bg));
             color: var(--text-color);
+            min-height: 100vh;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow-x: hidden;
+            padding: 2rem;
+            box-sizing: border-box;
         }
 
-        .container {
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
+            border-radius: 24px;
             padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 254, 0.1);
-            width: 90%;
-            max-width: 480px;
-            text-align: center;
-            transition: transform 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
 
-        .container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 242, 254, 0.2);
+        @media (max-width: 900px) {
+            body {
+                padding: 1rem;
+            }
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 1.5rem;
+                gap: 1.5rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+            .action-btn {
+                padding: 14px 24px;
+                font-size: 1rem;
+            }
         }
 
-        h1 {
-            margin-bottom: 2rem;
+        /* Section Styling */
+        .section-title {
             color: var(--accent-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
             font-weight: 700;
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-            text-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .form-group {
+        .config-panel {
+            padding-right: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .config-panel {
+                padding-right: 0;
+            }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
             margin-bottom: 1.5rem;
-            text-align: left;
-            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* More Tools Dropdown Area */
+        .more-tools-container {
+            width: 100%;
+            margin-bottom: 1.5rem;
+            display: none;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .more-tools-container.active {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.2rem;
         }
 
         label {
             display: block;
-            margin-bottom: 0.8rem;
-            color: var(--text-color);
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
-        input[type="text"], select {
+        input[type="text"], input[type="email"], input[type="password"], select, textarea {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--glass-border);
             border-radius: 10px;
@@ -86,18 +161,94 @@
             outline: none;
         }
 
-        input[type="text"]:focus, select:focus {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, select:focus, textarea:focus {
             border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
             background: rgba(0, 0, 0, 0.5);
         }
 
-        select option {
-            background-color: var(--tertiary-bg);
-            color: white;
+        /* Color Pickers */
+        .color-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .color-group {
+            flex: 1;
         }
 
-        button {
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+        }
+        
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        #qr-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .checkerboard {
+            background-color: #fff;
+            background-image: 
+              linear-gradient(45deg, #ccc 25%, transparent 25%), 
+              linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #ccc 75%), 
+              linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        /* Buttons */
+        .action-btn {
             background: var(--accent-gradient);
             color: white;
             border: none;
@@ -107,124 +258,277 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 1rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            transition: transform 0.2s;
         }
 
-        button:hover {
+        .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
-            filter: brightness(1.1);
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3);
         }
 
-        button:active {
-            transform: translateY(1px);
+        .download-group {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            margin-top: 1rem;
         }
 
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
+        .secondary-btn {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        #result {
-            margin-top: 2.5rem;
-            display: none;
-            animation: fadeIn 0.5s ease-out;
+        .secondary-btn:hover {
+            background: var(--accent-color);
+            color: var(--primary-bg);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        #qr-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        #qr-image:hover {
-            transform: scale(1.02);
-        }
-
-        .download-btn {
-            background: transparent;
-            display: inline-block;
-            text-decoration: none;
-            color: var(--accent-color);
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1rem;
-            border: 2px solid var(--accent-color);
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .download-btn:hover {
-            background: var(--accent-color);
-            color: var(--primary-bg);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>叠加态QRcode小工具</h1>
-        <form id="qr-form">
-            <div class="form-group">
-                <label for="url">链接 / 文本内容</label>
-                <input type="text" id="url" name="url" placeholder="在此输入需要转换的内容..." required>
-            </div>
+    <div class="main-container">
+        <!-- Left Panel: Configuration -->
+        <div class="config-panel">
+            <h1 class="section-title">叠加态QR-code工具</h1>
             
-            <div class="form-group">
-                <label for="size">生成尺寸</label>
-                <select id="size" name="size">
-                    <option value="350">标准 (350x350)</option>
-                    <option value="200">小尺寸 (200x200)</option>
-                    <option value="500">大尺寸 (500x500)</option>
-                    <option value="800">超高清 (800x800)</option>
-                </select>
+            <form id="qr-form">
+                <!-- Content Type Tabs -->
+                <div class="tabs">
+                    <button type="button" class="tab-btn active" onclick="switchTab('url')">链接</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('text')">文本</button>
+                    <button type="button" class="tab-btn" onclick="toggleMoreTools(this)">更多功能 ▼</button>
+                </div>
+
+                <div id="more-tools" class="more-tools-container">
+                    <button type="button" class="tab-btn" onclick="switchTab('wifi')">Wi-Fi</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('vcard')">名片</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('email')">邮件</button>
+                </div>
+
+                <input type="hidden" name="content_type" id="content_type" value="url">
+
+                <!-- Tab Contents -->
+                <div id="tab-url" class="tab-content active">
+                    <div class="form-group">
+                        <label>网站链接</label>
+                        <input type="text" name="url" placeholder="https://example.com">
+                    </div>
+                </div>
+
+                <div id="tab-text" class="tab-content">
+                    <div class="form-group">
+                        <label>纯文本内容</label>
+                        <textarea name="text_content" placeholder="在此输入文本内容..."></textarea>
+                    </div>
+                </div>
+
+                <div id="tab-wifi" class="tab-content">
+                    <div class="form-group">
+                        <label>网络名称 (SSID)</label>
+                        <input type="text" name="wifi_ssid">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="text" name="wifi_password">
+                    </div>
+                    <div class="form-group">
+                        <label>加密方式</label>
+                        <select name="wifi_encryption">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">无密码</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="wifi_hidden" value="true" id="wifi_hidden">
+                        <label for="wifi_hidden" style="margin:0">隐藏网络</label>
+                    </div>
+                </div>
+
+                <div id="tab-vcard" class="tab-content">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" name="vcard_name">
+                    </div>
+                    <div class="form-group">
+                        <label>公司/组织</label>
+                        <input type="text" name="vcard_org">
+                    </div>
+                    <div class="form-group">
+                        <label>电话号码</label>
+                        <input type="text" name="vcard_phone">
+                    </div>
+                    <div class="form-group">
+                        <label>电子邮箱</label>
+                        <input type="email" name="vcard_email">
+                    </div>
+                </div>
+
+                <div id="tab-email" class="tab-content">
+                    <div class="form-group">
+                        <label>收件人邮箱</label>
+                        <input type="email" name="email_address">
+                    </div>
+                    <div class="form-group">
+                        <label>主题</label>
+                        <input type="text" name="email_subject">
+                    </div>
+                    <div class="form-group">
+                        <label>正文内容</label>
+                        <textarea name="email_body"></textarea>
+                    </div>
+                </div>
+
+                <!-- Visual Settings -->
+                <h2 class="section-title" style="font-size: 1.2rem; margin-top: 2rem;">个性化设置</h2>
+                
+                <div class="form-group">
+                    <label>样式风格</label>
+                    <select name="style" id="style-select" onchange="toggleGradient()">
+                        <option value="rounded">科技黑圆角 (标准)</option>
+                        <option value="circle">极简黑圆点 (现代)</option>
+                        <option value="classic">经典方块格 (传统)</option>
+                        <option value="gradient">赛博渐变色 (炫酷)</option>
+                    </select>
+                </div>
+
+                <div class="color-row" id="solid-colors">
+                    <div class="color-group">
+                        <label>前景色</label>
+                        <input type="color" name="fg_color" value="#000000">
+                    </div>
+                    <div class="color-group">
+                        <label>背景色</label>
+                        <input type="color" name="bg_color" value="#FFFFFF">
+                    </div>
+                </div>
+
+                <div class="color-row" id="gradient-colors" style="display:none">
+                    <div class="color-group">
+                        <label>渐变起始色</label>
+                        <input type="color" name="gradient_start" value="#1E88E5">
+                    </div>
+                    <div class="color-group">
+                        <label>渐变结束色</label>
+                        <input type="color" name="gradient_end" value="#8BC34A">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" name="transparent" value="true" id="transparent" onchange="toggleBgColor()">
+                    <label for="transparent" style="margin:0">背景透明 (去底)</label>
+                </div>
+
+                <div class="form-group">
+                    <label>上传 Logo (可选)</label>
+                    <input type="file" name="logo" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label>尺寸 (px)</label>
+                    <input type="range" name="size" min="200" max="1000" value="350" oninput="document.getElementById('size-val').innerText = this.value">
+                    <span id="size-val" style="color:var(--text-muted); font-size: 0.9rem">350</span>
+                </div>
+
+                <button type="submit" class="action-btn" id="generate-btn">生成二维码</button>
+            </form>
+        </div>
+
+        <!-- Right Panel: Preview -->
+        <div class="preview-panel">
+            <h2 class="section-title">效果预览</h2>
+            <div id="preview-container">
+                <img id="qr-image" src="" alt="QR Preview" style="display:none">
+                <div id="placeholder" style="color: var(--text-muted); text-align: center; padding: 2rem; border: 2px dashed var(--glass-border); border-radius: 12px;">
+                    输入内容并点击生成查看预览
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="style">视觉风格</label>
-                <select id="style" name="style">
-                    <option value="rounded">科技黑圆角</option>
-                    <option value="circle">极简黑圆点</option>
-                    <option value="orange_circle">活力橙圆点</option>
-                    <option value="gradient">赛博渐变色</option>
-                    <option value="classic">经典方块格</option>
-                </select>
+            <div class="download-group" id="download-actions" style="display:none">
+                <button type="button" class="secondary-btn" onclick="downloadQR('png')">下载 PNG</button>
+                <button type="button" class="secondary-btn" onclick="downloadQR('svg')">下载 SVG</button>
             </div>
-
-            <button type="submit">立即生成</button>
-        </form>
-
-        <div id="result">
-            <img id="qr-image" src="" alt="QR Code">
-            <br>
-            <a id="download-link" href="#" class="download-btn" download="qrcode.png">下载图片</a>
         </div>
     </div>
 
     <script>
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Find the button that called this function - careful as it might be in the more-tools container
+            // We can just find the button with the matching onclick
+            const buttons = document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`);
+            buttons.forEach(btn => btn.classList.add('active'));
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // Update hidden input
+            document.getElementById('content_type').value = tabId;
+        }
+
+        function toggleMoreTools(btn) {
+            const container = document.getElementById('more-tools');
+            if (container.style.display === 'flex') {
+                container.style.display = 'none';
+                btn.classList.remove('active');
+            } else {
+                container.style.display = 'flex';
+                btn.classList.add('active');
+            }
+        }
+
+        function toggleGradient() {
+            const style = document.getElementById('style-select').value;
+            const solidColors = document.getElementById('solid-colors');
+            const gradientColors = document.getElementById('gradient-colors');
+            
+            if (style === 'gradient') {
+                solidColors.style.display = 'none';
+                gradientColors.style.display = 'flex';
+            } else {
+                solidColors.style.display = 'flex';
+                gradientColors.style.display = 'none';
+            }
+        }
+
+        function toggleBgColor() {
+            const isTransparent = document.getElementById('transparent').checked;
+            const inputs = document.querySelectorAll('input[name="bg_color"]');
+            inputs.forEach(input => input.disabled = isTransparent);
+        }
+
         document.getElementById('qr-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
-            const button = this.querySelector('button');
-            const originalText = button.innerText;
-            button.innerText = '生成中...';
-            button.disabled = true;
+            const btn = document.getElementById('generate-btn');
+            const originalText = btn.innerText;
+            
+            btn.innerText = '生成中...';
+            btn.disabled = true;
 
             try {
+                // Request PNG for preview
+                formData.set('format', 'png');
+                
                 const response = await fetch('/generate', {
                     method: 'POST',
                     body: formData
@@ -235,23 +539,61 @@
                     const url = URL.createObjectURL(blob);
                     
                     const img = document.getElementById('qr-image');
+                    const placeholder = document.getElementById('placeholder');
+                    const downloadActions = document.getElementById('download-actions');
+                    
                     img.src = url;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    downloadActions.style.display = 'flex';
                     
-                    const downloadLink = document.getElementById('download-link');
-                    downloadLink.href = url;
-                    
-                    document.getElementById('result').style.display = 'block';
+                    // Handle transparency checkboard
+                    if (formData.get('transparent') === 'true') {
+                        img.classList.add('checkerboard');
+                    } else {
+                        img.classList.remove('checkerboard');
+                    }
                 } else {
-                    alert('生成失败，请重试');
+                    alert('生成失败，请检查输入是否正确。');
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('发生错误，请检查网络连接');
+                console.error(error);
+                alert('发生错误，请重试。');
             } finally {
-                button.innerText = originalText;
-                button.disabled = false;
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         });
+
+        async function downloadQR(format) {
+            const form = document.getElementById('qr-form');
+            const formData = new FormData(form);
+            formData.set('format', format);
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `qrcode.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert('下载失败');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('下载出错');
+            }
+        }
     </script>
 </body>
 </html>
