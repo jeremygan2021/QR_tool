@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  qr-generator:
+    build: .
+    ports:
+      - "8711:8711"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
