@@ -17,11 +17,11 @@ SERVER_HOST="6.6.6.86"           # 服务器IP地址
 SERVER_USER="ubuntu"                     # 服务器用户名
 SERVER_PASSWORD="qweasdzxc1"        # 服务器密码
 SERVER_PORT="22"                       # SSH端口，默认22
-IMAGE_NAME="xkyd-image"              # Docker镜像名称
+IMAGE_NAME="qr_code-image"              # Docker镜像名称
 IMAGE_TAG="latest"                     # Docker镜像标签
-CONTAINER_NAME="xkyd-container"       # 容器名称
-LOCAL_PORT="5175"                      # 本地端口
-CONTAINER_PORT="5175"                  # 容器端口
+CONTAINER_NAME="qr_code-container"       # 容器名称
+LOCAL_PORT="8711"                      # 本地端口
+CONTAINER_PORT="8711"                  # 容器端口
 TAR_FILE="${IMAGE_NAME}-${IMAGE_TAG}.tar"  # 压缩包文件名
 
 # 架构相关变量
