@@ -13,10 +13,10 @@
 # =============================================================================
 
 # 配置变量 - 请根据实际情况修改
-SERVER_HOST="121.43.104.161"           # 服务器IP地址
+SERVER_HOST="6.6.6.86"           # 服务器IP地址
 SERVER_USER="ubuntu"                     # 服务器用户名
 SERVER_PASSWORD="qweasdzxc1"        # 服务器密码
-SERVER_PORT="6222"                       # SSH端口，默认22
+SERVER_PORT="22"                       # SSH端口，默认22
 IMAGE_NAME="qr_code-image"              # Docker镜像名称
 IMAGE_TAG="latest"                     # Docker镜像标签
 CONTAINER_NAME="qr_code-container"       # 容器名称
